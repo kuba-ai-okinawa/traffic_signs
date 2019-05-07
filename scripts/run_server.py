@@ -19,7 +19,7 @@ def main():
 
     config = traffic.utilities.get_yaml_configuration(sys.argv[1:])
 
-    app = traffic.web.server.get_configured_app(config)
+    app = traffic.web.server.get_configured_web_app(config)
     app.run(host="0.0.0.0", port=5000)
 
 

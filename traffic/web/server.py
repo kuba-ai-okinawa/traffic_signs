@@ -7,7 +7,7 @@ import flask
 import traffic.web.blueprint
 
 
-def get_configured_app(config):
+def get_configured_web_app(config):
     """
     Creates and configures flask application instance
     :param config: dictionary with configuration options

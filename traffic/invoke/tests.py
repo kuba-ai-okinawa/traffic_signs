@@ -26,7 +26,7 @@ def unit_tests(context):
     Runs pytest on tests defined in commit stage directory
     """
 
-    context.run("py.test ./tests/commit_stage/unit_tests", echo=True, pty=True)
+    context.run("py.test ./tests/commit_stage", echo=True, pty=True)
 
 
 @invoke.task
@@ -38,3 +38,13 @@ def commit_stage(context):
 
     unit_tests(context)
     static_code_analysis(context)
+
+
+@invoke.task
+def acceptance_stage(context):
+    """
+    Acceptance stage task.
+    Runs acceptance tests
+    """
+
+    context.run("py.test ./tests/acceptance_stage", echo=True, pty=True)
