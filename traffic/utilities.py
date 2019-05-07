@@ -24,10 +24,10 @@ def get_yaml_configuration(command_line_arguments):
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--config', action="store", required=True)
+    parser.add_argument('--config_path', action="store", required=True)
     arguments = parser.parse_args(command_line_arguments)
 
-    with open(arguments.config) as file:
+    with open(arguments.config_path) as file:
         config = yaml.safe_load(file)
 
         return config
