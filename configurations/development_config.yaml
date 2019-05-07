@@ -2,6 +2,12 @@ data_directory: "../../data/traffic-signs-data"
 input_shape: [32, 32, 3]
 categories_count: 43
 
+server:
+
+  run_in_debug_mode: True
+
 train:
 
   batch_size: 128
+
+

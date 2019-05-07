@@ -6,6 +6,7 @@ import sys
 
 import keras
 
+import traffic.data
 import traffic.ml
 import traffic.utilities
 
@@ -17,7 +18,7 @@ def main():
 
     config = traffic.utilities.get_yaml_configuration(sys.argv[1:])
 
-    data_bunch = traffic.utilities.TrafficDataBunch(
+    data_bunch = traffic.data.TrafficDataBunch(
         config["data_directory"],
         categories_count=config["categories_count"],
         batch_size=config["train"]["batch_size"])

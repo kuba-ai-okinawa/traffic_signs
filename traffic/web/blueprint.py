@@ -1,3 +1,7 @@
+"""
+Module with server endpoints
+"""
+
 import datetime
 
 import flask

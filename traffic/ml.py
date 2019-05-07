@@ -6,6 +6,12 @@ import keras
 
 
 def get_model(input_shape, categories_count):
+    """
+    Builds and returns deep convolutional network for categorization
+    :param input_shape: tuple of 3 ints, specifies input shape
+    :param categories_count: int, number of categories model will predict from
+    :return: keras functional model instance
+    """
 
     input_layer = keras.layers.Input(shape=input_shape)
 
