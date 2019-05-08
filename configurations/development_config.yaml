@@ -1,3 +1,5 @@
+environment: "development"
+
 data_directory: "../../data/traffic-signs-data"
 input_shape: [32, 32, 3]
 categories_count: 43
