@@ -2,8 +2,12 @@
 Dummy tests module
 """
 
+import io
+
 import pytest
 import yaml
+import numpy as np
+import cv2
 
 import traffic.web.server
 
@@ -38,3 +42,29 @@ def test_ping_endpoint(app_fixture):
         response_text = response.get_data(as_text=True)
 
         assert "ping" in response_text
+
+
+def test_top_prediction_endpoint(app_fixture):
+    """
+    Test positive negative prediction endpoint
+    """
+
+    app = app_fixture
+
+    with app.test_client() as client:
+
+        image = np.ones(shape=(32, 32, 3))
+        _, encoded_image = cv2.imencode('.jpg', image)
+
+        data = {
+            'image': (io.BytesIO(encoded_image.tostring()), 'image')
+        }
+
+        response = client.post("/top_prediction", data=data)
+
+        assert response.status_code == 200
+
+        response_text = response.get_data(as_text=True)
+
+        assert "category" in response_text
+        assert "confidence" in response_text
