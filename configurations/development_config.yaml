@@ -4,7 +4,7 @@ DATA_DIRECTORY: "../../data/traffic-signs-data"
 INPUT_SHAPE: [32, 32, 3]
 
 CATEGORIES_COUNT: 43
-CATEGORIES_IDS_TO_NAMES_CSV_PATH: "./signs_ids_to_names.csv"
+CATEGORIES_IDS_TO_NAMES_CSV_PATH: "./data/signs_ids_to_names.csv"
 
 MODEL_WEIGHTS_PATH: "../../data/traffic-signs-model.h5"
 

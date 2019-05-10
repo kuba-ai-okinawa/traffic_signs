@@ -36,7 +36,7 @@ def main():
     model.fit_generator(
         generator=data_bunch.training_data_generator,
         steps_per_epoch=data_bunch.training_samples_count // config["TRAIN"]["batch_size"],
-        epochs=1, callbacks=callbacks,
+        epochs=2, callbacks=callbacks,
         validation_data=data_bunch.validation_data_generator,
         validation_steps=data_bunch.validation_samples_count // config["TRAIN"]["batch_size"]
     )

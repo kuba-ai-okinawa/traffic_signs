@@ -7,6 +7,8 @@ import os
 import logging
 
 import yaml
+import cv2
+import numpy as np
 
 
 def get_yaml_configuration(command_line_arguments):
@@ -44,3 +46,14 @@ def get_logger(path, name):
     logger.addHandler(file_handler)
 
     return logger
+
+
+def binary_string_image_to_numpy_image(binary_string):
+    """
+    Decodes binary string into a numpy array representation of an image
+    :param binary_string: bytes structure
+    :return: numpy array
+    """
+
+    flat_numpy_array = np.frombuffer(binary_string, np.uint8)
+    return cv2.imdecode(flat_numpy_array, cv2.IMREAD_ANYCOLOR)

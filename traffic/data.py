@@ -9,6 +9,7 @@ import imgaug
 import keras
 import numpy as np
 import sklearn.utils
+import cv2
 
 
 def get_datasets(datasets_directory):
@@ -35,10 +36,10 @@ def get_datasets(datasets_directory):
     return training_data, validation_data
 
 
-def get_data_generator(features, labels, batch_size, shuffle=False, augmentations_pipeline=None):
+def get_data_generator(images, labels, batch_size, shuffle=False, augmentations_pipeline=None):
     """
     Creates a generator that combines features and labels into batches, optionally shuffling and augmenting
-    :param features: list of features
+    :param images: list of images
     :param labels: list of ints
     :param batch_size: int, batch size
     :param shuffle: boolean
@@ -46,10 +47,10 @@ def get_data_generator(features, labels, batch_size, shuffle=False, augmentation
     :return: generator
     """
 
-    local_features = copy.deepcopy(features)
+    local_images = copy.deepcopy(images)
     local_labels = copy.deepcopy(labels)
 
-    features_batch = []
+    images_batch = []
     labels_batch = []
 
     while True:
@@ -57,26 +58,26 @@ def get_data_generator(features, labels, batch_size, shuffle=False, augmentation
         # Shuffle features and labels if desired
         if shuffle is True:
 
-            local_features, local_labels = sklearn.utils.shuffle(local_features, local_labels)
+            local_images, local_labels = sklearn.utils.shuffle(local_images, local_labels)
 
-        # Iterate over feature and labels
-        for feature, label in zip(local_features, local_labels):
+        # Iterate over image and labels
+        for image, label in zip(local_images, local_labels):
 
-            features_batch.append(feature)
+            images_batch.append(image)
             labels_batch.append(label)
 
             # Keep on adding features and labels to their respective batches until requested size is reached
-            if len(features_batch) == batch_size:
+            if len(images_batch) == batch_size:
 
                 if augmentations_pipeline is not None:
 
-                    features_batch = augmentations_pipeline.augment_images(features_batch)
+                    images_batch = augmentations_pipeline.augment_images(images_batch)
 
                 # Yield batch
-                yield np.array(features_batch), np.array(labels_batch)
+                yield np.array(images_batch), np.array(labels_batch)
 
                 # Clear containers so they can start accumulating new batches
-                features_batch.clear()
+                images_batch.clear()
                 labels_batch.clear()
 
 
@@ -95,8 +96,13 @@ class TrafficDataBunch:
 
         training_data, validation_data = get_datasets(datasets_directory)
 
-        preprocessed_training_features = training_data["features"].astype(np.float32) / 255
-        preprocessed_validation_features = validation_data["features"].astype(np.float32) / 255
+        # Flip images to BGR order
+        training_images = np.array([cv2.cvtColor(image, cv2.COLOR_RGB2BGR) for image in training_data["features"]])
+        validation_images = np.array([cv2.cvtColor(image, cv2.COLOR_RGB2BGR) for image in validation_data["features"]])
+
+        # Turn them to floats in <0,1> range
+        training_images = training_images.astype(np.float32) / 255
+        validation_images = validation_images.astype(np.float32) / 255
 
         augmentations_pipeline = imgaug.augmenters.SomeOf(
             (0, None),
@@ -106,14 +112,14 @@ class TrafficDataBunch:
             random_order=True)
 
         self.training_data_generator = get_data_generator(
-            preprocessed_training_features,
+            training_images,
             keras.utils.to_categorical(training_data["labels"], num_classes=categories_count),
             batch_size=batch_size, shuffle=True, augmentations_pipeline=augmentations_pipeline)
 
         self.training_samples_count = len(training_data["labels"])
 
         self.validation_data_generator = get_data_generator(
-            preprocessed_validation_features,
+            validation_images,
             keras.utils.to_categorical(validation_data["labels"], num_classes=categories_count),
             batch_size=batch_size, shuffle=False)
 
