@@ -139,6 +139,7 @@ disable=print-statement,
         no-self-use,
         no-value-for-parameter,
         arguments-differ,
+        comparison-with-itself,
         fixme
 
 # Enable the message, report, category or checker with the given id(s). You can
