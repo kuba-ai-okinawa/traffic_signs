@@ -1,8 +1,10 @@
-environment: "test"
+ENVIRONMENT: "test"
 
-input_shape: [32, 32, 3]
-categories_count: 43
+INPUT_SHAPE: [32, 32, 3]
 
-server:
+CATEGORIES_COUNT: 43
+CATEGORIES_IDS_TO_NAMES_CSV_PATH: "./signs_ids_to_names.csv"
 
-  run_in_debug_mode: True
+FLASK:
+
+  DEBUG: True

@@ -4,6 +4,7 @@ Module for building configurable flask app
 
 import flask
 import tensorflow as tf
+import pandas
 
 import traffic.web.blueprint
 import traffic.ml
@@ -17,11 +18,14 @@ def setup_prediction_models(app, config):
     """
 
     # Set up traffic signs categorization model
-    app.traffic_signs_model = traffic.ml.get_model(config["input_shape"], config["categories_count"])
+    app.traffic_signs_model = traffic.ml.get_model(config["INPUT_SHAPE"], config["CATEGORIES_COUNT"])
 
-    if config["environment"] != "test":
-        print("\n\nWarning! Skipping loading weights! Need to sort this part out!\n\n".upper())
-        # app.traffic_signs_model.load_weights(filepath=config["positive_negative"]["best_model_weights_path"])
+    if config["ENVIRONMENT"] != "test":
+
+        app.traffic_signs_model.load_weights(filepath=config["MODEL_WEIGHTS_PATH"])
+
+    categories_data_frame = pandas.read_csv(config["CATEGORIES_IDS_TO_NAMES_CSV_PATH"], comment="#")
+    app.traffic_signs_categories = categories_data_frame["SignName"]
 
     app.default_graph = tf.get_default_graph()
 
@@ -34,7 +38,8 @@ def get_configured_web_app(config):
     """
 
     app = flask.Flask("traffic_signs")
-    app.debug = config["server"]["run_in_debug_mode"]
+    app.debug = config["FLASK"]["DEBUG"]
+    app.config.from_mapping(config)
 
     setup_prediction_models(app, config)
     app.register_blueprint(traffic.web.blueprint.BLUEPRINT)
