@@ -110,8 +110,8 @@ def top_k_predictions():
         top_k_categories = flask.current_app.traffic_signs_categories[top_k_indices]
         top_k_confidences = raw_predictions[top_k_indices]
 
-        # Create a list of tuples (category, confidence), in descending order.
-        # We need to cast confidences from numpy floats to normal floats, as numpy floats can't be json serialized.
-        # For same reason we need to cast zip iterator to list,
-        category_confidence_tuples = list(zip(top_k_categories, top_k_confidences.tolist()))
-        return json.dumps(category_confidence_tuples)
+        results_dictionary = [
+            {"category": category, "confidence": float(confidence)}
+            for category, confidence in zip(top_k_categories, top_k_confidences)]
+
+        return json.dumps(results_dictionary)
