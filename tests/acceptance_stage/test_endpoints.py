@@ -94,13 +94,10 @@ def test_top_k_predictions_endpoint(app_fixture):
 
         assert response.status_code == 200
 
-        response_text = response.get_data(as_text=True)
-
-        data = json.loads(response_text)
+        data = json.loads(response.get_data(as_text=True))
 
         # Assert we got a list of expected length
-        assert isinstance(data, list)
-        assert len(data) == 3
+        assert isinstance(data, list) and len(data) == 3
 
         # Assert each element of a list is a dictionary with expected structure
         for element in data:

@@ -2,7 +2,6 @@
 Script for running flask server
 """
 
-import argparse
 import sys
 
 import traffic.web.server
@@ -13,9 +12,6 @@ def main():
     """
     Script entry point
     """
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--config_path", help="path to config file", required=True)
 
     config = traffic.utilities.get_yaml_configuration(sys.argv[1:])
 
