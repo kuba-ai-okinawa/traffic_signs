@@ -14,8 +14,7 @@ To run web server:
 `docker build --tag aiokinawa/traffic_signs:001 -f ./docker/001/Dockerfile .`
 
 - Build container that updates code, data and anaconda environment  
-`TRAFFIC_SIGNS_MODEL_PATH=$(realpath ../../../data/traffic-signs-model.h5) \
-    docker build --tag aiokinawa/traffic_signs:latest -f ./docker/latest/Dockerfile .`
-    
+`docker build --tag aiokinawa/traffic_signs:latest -f ./docker/latest/Dockerfile .`
+
 - Run docker:  
 `docker run -it --rm -p 5000:5000 aiokinawa/traffic_signs:latest bash`

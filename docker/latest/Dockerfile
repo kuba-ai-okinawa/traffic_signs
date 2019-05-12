@@ -4,11 +4,10 @@ LABEL name="aiokinawa/traffic_signs"
 LABEL version="latest"
 
 # Copy code and data
-COPY . /app_user/projects/code/traffic_signs
-COPY $TRAFFIC_SIGNS_MODEL_PATH /app_user/projects/data/traffic-signs-model.h5
+COPY . /app
 
 # Set working directory to project's dir
-WORKDIR /app_user/projects/code/traffic_signs
+WORKDIR /app
 
 # Update conda environment
-RUN conda env update -f ./environment_linux.yaml
+#RUN conda env update -f ./environment_linux.yaml

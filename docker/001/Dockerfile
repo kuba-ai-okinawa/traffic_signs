@@ -8,8 +8,9 @@ RUN apt update && apt install -y wget \
     && wget https://repo.continuum.io/archive/Anaconda3-5.3.0-Linux-x86_64.sh \
     && bash ./Anaconda3-5.3.0-Linux-x86_64.sh -b -p /root/anaconda3
 
-# Add anaconda to PATH
+# Set up environment variables as needed
 ENV PATH="/root/anaconda3/bin:${PATH}"
+ENV PYTHONPATH=.
 
 # Update conda environment
 COPY ./environment_linux.yaml /tmp/environment_linux.yaml
