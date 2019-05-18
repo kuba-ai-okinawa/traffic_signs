@@ -10,4 +10,7 @@ COPY . /app
 WORKDIR /app
 
 # Update conda environment
-#RUN conda env update -f ./environment_linux.yaml
+RUN conda env update -f ./environment_linux.yaml
+
+# Run the app
+CMD  python ./scripts/run_server.py --config=./configurations/development_config.yaml

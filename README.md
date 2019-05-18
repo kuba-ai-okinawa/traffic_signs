@@ -16,5 +16,5 @@ To run web server:
 - Build container that updates code, data and anaconda environment  
 `docker build --tag aiokinawa/traffic_signs:latest -f ./docker/latest/Dockerfile .`
 
-- Run docker:  
+- Start container and log inside it:  
 `docker run -it --rm -p 5000:5000 aiokinawa/traffic_signs:latest bash`
