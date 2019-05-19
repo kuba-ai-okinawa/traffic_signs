@@ -16,5 +16,8 @@ To run web server:
 - Build container that updates code, data and anaconda environment  
 `docker build --tag aiokinawa/traffic_signs:latest -f ./docker/latest/Dockerfile .`
 
+- Start container and run flask server:  
+`docker run -it --rm -p 5000:5000 aiokinawa/traffic_signs:latest`
+
 - Start container and log inside it:  
 `docker run -it --rm -p 5000:5000 aiokinawa/traffic_signs:latest bash`
