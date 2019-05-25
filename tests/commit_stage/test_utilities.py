@@ -18,6 +18,6 @@ def test_binary_string_image_to_numpy_image():
     _, encoded_image = cv2.imencode('.jpg', expected)
     binary_string = encoded_image.tostring()
 
-    actual = traffic.utilities.binary_string_image_to_numpy_image(binary_string)
+    actual = traffic.utilities.binary_rgb_image_string_to_numpy_image(binary_string)
 
     assert np.all(expected == actual)
