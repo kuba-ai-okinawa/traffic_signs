@@ -1,6 +1,7 @@
 """
-Dummy tests module
+Endpoints tests
 """
+
 
 def test_ping_endpoint():
     """

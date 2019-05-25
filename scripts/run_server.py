@@ -14,7 +14,7 @@ import traffic.utilities
 import traffic.ml
 
 
-def setup_prediction_models(app, config):
+def setup_prediction_models(app):
     """
     Adds prediction models to application object
     :param app: flask application instance
@@ -22,13 +22,10 @@ def setup_prediction_models(app, config):
     """
 
     # Set up traffic signs categorization model
-    app.traffic_signs_model = traffic.ml.get_model(config["INPUT_SHAPE"], config["CATEGORIES_COUNT"])
+    app.traffic_signs_model = traffic.ml.get_model(input_shape=(32, 32, 3), categories_count=43)
+    app.traffic_signs_model.load_weights(filepath="./data/untracked_data/traffic-signs-model.h5")
 
-    if config["ENVIRONMENT"] != "test":
-
-        app.traffic_signs_model.load_weights(filepath=config["MODEL_WEIGHTS_PATH"])
-
-    categories_data_frame = pandas.read_csv(config["CATEGORIES_IDS_TO_NAMES_CSV_PATH"], comment="#")
+    categories_data_frame = pandas.read_csv("./data/signs_ids_to_names.csv", comment="#")
     app.traffic_signs_categories = categories_data_frame["SignName"]
 
     app.default_graph = tf.get_default_graph()
@@ -36,12 +33,9 @@ def setup_prediction_models(app, config):
 
 APP = flask.Flask("traffic_signs")
 
-config = traffic.utilities.get_yaml_configuration(sys.argv[1:])
+APP.debug = True
 
-APP.debug = config["FLASK"]["DEBUG"]
-APP.config.from_mapping(config)
-
-setup_prediction_models(APP, config)
+setup_prediction_models(APP)
 
 
 @APP.route("/ping")
@@ -62,7 +56,7 @@ def top_prediction():
     with flask.current_app.default_graph.as_default():
 
         raw_image_file = flask.request.files["image"]
-        image = traffic.utilities.binary_string_image_to_numpy_image(raw_image_file.read())
+        image = traffic.utilities.binary_rgb_image_string_to_numpy_image(raw_image_file.read())
 
         # Preprocessing
         image = image.astype(np.float32) / 255

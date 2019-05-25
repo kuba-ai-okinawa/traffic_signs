@@ -29,12 +29,13 @@ def get_yaml_configuration(command_line_arguments):
         return config
 
 
-def binary_string_image_to_numpy_image(binary_string):
+def binary_rgb_image_string_to_numpy_image(binary_rgb_image_string):
     """
     Decodes binary string into a numpy array representation of an image
-    :param binary_string: bytes structure
+    :param binary_rgb_image_string: bytes structure for image in rgb order
     :return: numpy array
     """
 
-    flat_numpy_array = np.frombuffer(binary_string, np.uint8)
-    return cv2.imdecode(flat_numpy_array, cv2.IMREAD_ANYCOLOR)
+    flat_numpy_array = np.frombuffer(binary_rgb_image_string, np.uint8)
+    rgb_image = cv2.imdecode(flat_numpy_array, cv2.IMREAD_ANYCOLOR)
+    return cv2.cvtColor(rgb_image, cv2.COLOR_RGB2BGR)
