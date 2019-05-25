@@ -23,3 +23,6 @@ To run web server:
 
 - Start container and log inside it:  
 `docker run -it --rm -p 5000:5000 aiokinawa/traffic_signs:latest bash`
+
+
+Just trying things
