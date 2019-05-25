@@ -2,6 +2,9 @@
 
 Data: https://s3-us-west-1.amazonaws.com/udacity-selfdrivingcar/traffic-signs-data.zip
 
+To create environment:
+conda env create -f ./environment_osx.yaml
+
 To train model:
 `python ./scripts/train.py --config_path=/path/to/config`
 
