@@ -29,25 +29,6 @@ def get_yaml_configuration(command_line_arguments):
         return config
 
 
-def get_logger(path, name):
-    """
-    Returns logger instance
-    :param path: path to where logger's output should be saved
-    :param name: logger's name
-    :return: Logger instance
-    """
-
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-
-    logger = logging.getLogger(name)
-    file_handler = logging.FileHandler(path, mode="w")
-
-    logger.setLevel(logging.INFO)
-    logger.addHandler(file_handler)
-
-    return logger
-
-
 def binary_string_image_to_numpy_image(binary_string):
     """
     Decodes binary string into a numpy array representation of an image
