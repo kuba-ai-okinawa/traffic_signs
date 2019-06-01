@@ -18,7 +18,6 @@ def setup_prediction_models(app):
     """
     Adds prediction models to application object
     :param app: flask application instance
-    :param config: dictionary with options
     """
 
     # Set up traffic signs categorization model
