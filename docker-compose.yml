@@ -1,0 +1,8 @@
+version: "2"
+services:
+  server:
+    restart: always
+    image: aiokinawa/traffic_signs:latest
+    ports:
+      - "5000:5000"
+    command: python ./scripts/run_server.py --config_path=/path/to/config
