@@ -59,12 +59,11 @@ def top_prediction():
         image = traffic.utilities.binary_rgb_image_string_to_numpy_image(raw_image_file.read())
 
         # Preprocessing
-        image = image.astype(np.float32) / 255
+        image = preprocess(image)
 
         # Magic herei
-        image = cv2.resize(image, (32, 32))
 
-        y = APP.traffic_signs_model.predict(image[None])[0]
+        y = APP.traffic_signs_model.predict(image)[0]
 
         sorted_inds = np.argsort(y)
 
@@ -74,6 +73,13 @@ def top_prediction():
         ret = 'prediction: {}, confidence: {}'.format(top_predictions[0], confidences[0])
 
         return ret
+
+
+def preprocess(np_image: np.ndarray) -> np.ndarray:
+    import cv2
+    resized_image = cv2.resize(np_image, (32, 32), cv2.INTER_LANCZOS4)
+    resized_image = resized_image.astype(np.float32) / 255
+    return resized_image[np.newaxis, :, :, :]
 
 
 def main():
