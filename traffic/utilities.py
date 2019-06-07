@@ -3,12 +3,10 @@ Module with various utilities
 """
 
 import argparse
-import os
-import logging
 
-import yaml
 import cv2
 import numpy as np
+import yaml
 
 
 def get_yaml_configuration(command_line_arguments):

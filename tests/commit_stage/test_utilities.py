@@ -2,8 +2,8 @@
 Tests for utilities module
 """
 
-import numpy as np
 import cv2
+import numpy as np
 
 import traffic.utilities
 
