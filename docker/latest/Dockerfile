@@ -4,7 +4,8 @@ LABEL name="aiokinawa/traffic_signs"
 LABEL version="latest"
 
 # Copy code and data
-COPY . /app
+#COPY . /app
+COPY ./environment_linux.yaml /app/
 
 # Set working directory to project's dir
 WORKDIR /app

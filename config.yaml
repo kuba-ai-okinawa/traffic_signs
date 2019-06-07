@@ -1,0 +1,4 @@
+port: 5000
+host: "0.0.0.0"
+model_weight_path: "./data/untracked_data/traffic-signs-model.h5"
+ids_name_path: "./data/signs_ids_to_names.csv"

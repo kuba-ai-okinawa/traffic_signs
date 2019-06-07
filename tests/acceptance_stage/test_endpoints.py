@@ -2,6 +2,7 @@
 Endpoints tests
 """
 
+<<<<<<< HEAD
 import io
 import json
 import flask
@@ -9,15 +10,27 @@ import pytest
 import numpy as np
 import cv2
 
+=======
+import pytest
+>>>>>>> 96b93c80f99a921c3d44f615cccd91360dd3113e
 import scripts.run_server
 
 
 @pytest.fixture
 def client():
     """Prepare client"""
+<<<<<<< HEAD
     app = flask.Flask('test')
     scripts.run_server.setup_prediction_models(app)
     app.register_blueprint(scripts.run_server.GENERAL_ENDPOINT)
+=======
+
+    config = {
+        "model_weight_path": "",
+        "ids_name_path": "./data/signs_ids_to_names.csv"
+    }
+    app = scripts.run_server.create_app(config, is_test_env=True)
+>>>>>>> 96b93c80f99a921c3d44f615cccd91360dd3113e
     client = app.test_client()
     yield client
 
