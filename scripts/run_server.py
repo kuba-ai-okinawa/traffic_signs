@@ -35,22 +35,6 @@ def setup_prediction_models(app, is_test_env):
 GENERAL_ENDPOINT = flask.Blueprint('general', __name__)
 
 
-def compute_top_k_indexes(predicted: np.ndarray, k: int):
-    """
-    :param predicted: CNN outputs (confidence values)
-    :param k: number of top results
-    :return: top-k index list
-    """
-    sorted_indexes = np.argsort(predicted)[::-1]
-    traffic_sign_categories = flask.current_app.traffic_signs_categories
-    assert k > 0
-
-    if k > len(traffic_sign_categories):
-        k = len(traffic_sign_categories)
-
-    return sorted_indexes[:k]
-
-
 @GENERAL_ENDPOINT.route("/ping")
 def ping():
     """
@@ -67,34 +51,38 @@ def top_prediction():
     """
     app = flask.current_app
     with app.default_graph.as_default():
-        raw_image_file = flask.request.files["image"]
-        image = traffic.utilities.binary_rgb_image_string_to_numpy_image(raw_image_file.read())
+        image = load_image(flask.request.files['image'])
 
-        # Preprocessing
-        image = preprocess(image)
+        predictions = app.traffic_signs_model.predict(image)[0]
 
-        # Magic herei
+        top_dict = generate_top_k_dicts(predictions, k=1)[0]
 
-        y = app.traffic_signs_model.predict(image)[0]
-
-        top_1_dict = generate_top_k_dicts(y, 1)[0]
-
-        return json.dumps(top_1_dict)
+        return json.dumps(top_dict)
 
 
-def generate_top_k_dicts(predicted: np.ndarray, k: int):
+@GENERAL_ENDPOINT.route("/top_k_prediction", methods=["POST"])
+def top_k_prediction():
     """
-    generate top-k dictionaries from CNN output
-    :param predicted: CNN outputs (confidence values)
-    :param k: number of top results
-    :return: top-k list of dictionary
+    Top prediction endpoint, outputs top prediction category and confidence
     """
-    app = flask.current_app
-    top_k_indexes = compute_top_k_indexes(predicted, k)
-    return [{'rank': rank + 1,
-             'category': app.traffic_signs_categories[top_k_index],
-             'confidence': float(predicted[top_k_index])}
-            for rank, top_k_index in enumerate(top_k_indexes)]
+
+    with flask.current_app.default_graph.as_default():
+        image = load_image(flask.request.files['image'])
+        k = int(flask.request.form['k'])
+
+        predictions = flask.current_app.traffic_signs_model.predict(image)[0]
+        top_k_dicts = generate_top_k_dicts(predictions, k)
+
+        return json.dumps(top_k_dicts)
+
+
+def load_image(raw_image_file):
+    """
+    get image data from POST and convert acceptable np.ndarray for CNN
+    :return:
+    """
+    image = traffic.utilities.binary_rgb_image_string_to_numpy_image(raw_image_file.read())
+    return preprocess(image)
 
 
 def preprocess(np_image: np.ndarray) -> np.ndarray:
@@ -106,6 +94,32 @@ def preprocess(np_image: np.ndarray) -> np.ndarray:
     resized_image = cv2.resize(np_image, (32, 32), cv2.INTER_LANCZOS4)
     resized_image = resized_image.astype(np.float32) / 255
     return resized_image[np.newaxis, :, :, :]
+
+
+def compute_top_k_indexes(predictions: np.ndarray, k: int):
+    """
+    :param predictions: CNN outputs (confidence values)
+    :param k: number of top results
+    :return: top-k index list
+    """
+    sorted_indexes = np.argsort(predictions)[::-1]
+    assert k > 0, 'k must be more than 0'
+    return sorted_indexes[:k]
+
+
+def generate_top_k_dicts(predictions: np.ndarray, k: int):
+    """
+    generate top-k dictionaries from CNN output
+    :param predictions: CNN outputs (confidence values)
+    :param k: number of top results
+    :return: top-k list of dictionary
+    """
+    app = flask.current_app
+    top_k_indexes = compute_top_k_indexes(predictions, k)
+    return [{'rank': rank + 1,
+             'category': app.traffic_signs_categories[top_k_index],
+             'confidence': float(predictions[top_k_index])}
+            for rank, top_k_index in enumerate(top_k_indexes)]
 
 
 def create_app(is_test_env=False):
