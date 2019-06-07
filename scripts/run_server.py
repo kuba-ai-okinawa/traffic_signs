@@ -82,29 +82,6 @@ def top_prediction():
         return json.dumps(top_1_dict)
 
 
-@APP.route("/top_k_prediction", methods=["POST"])
-def top_k_prediction():
-    """
-    Top prediction endpoint, outputs top prediction category and confidence
-    """
-
-    with flask.current_app.default_graph.as_default():
-
-        raw_image_file = flask.request.files["image"]
-        image = traffic.utilities.binary_rgb_image_string_to_numpy_image(raw_image_file.read())
-        k = int(flask.request.form['k'])
-
-        # Preprocessing
-        image = preprocess(image)
-
-        # Magic herei
-
-        y = APP.traffic_signs_model.predict(image)[0]
-        top_k_dicts = generate_top_k_dicts(y, k)
-
-        return json.dumps(top_k_dicts)
-
-
 def generate_top_k_dicts(predicted: np.ndarray, k: int):
     top_k_indexes = compute_top_k_indexes(predicted, k)
     return [{'rank': rank + 1,
