@@ -4,16 +4,16 @@ Endpoints tests
 
 import flask
 import pytest
-import scripts.run_server
+from scripts import run_server
 
 
 @pytest.fixture
 def client():
     """Prepare client"""
     app = flask.Flask('test')
-    scripts.run_server.setup_prediction_models(
+    run_server.setup_prediction_models(
         app, "./data/untracked_data/traffic-signs-model.h5", "./data/signs_ids_to_names.csv")
-    app.register_blueprint(scripts.run_server.GENERAL)
+    app.register_blueprint(run_server.GENERAL)
     client = app.test_client()
     yield client
 
