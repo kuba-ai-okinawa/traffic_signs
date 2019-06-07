@@ -9,9 +9,21 @@ import flask
 import numpy as np
 import pandas
 import tensorflow as tf
+import yaml
 
 import traffic.ml
 import traffic.utilities
+# import sys
+# sys.path.append(".")
+# from config import load_yaml
+
+
+def load_yaml(path):
+    """
+    hoge
+    """
+    with open(path) as file:
+        return yaml.load(file)
 
 
 def setup_prediction_models(app, model_weight_path, ids_name_path):
