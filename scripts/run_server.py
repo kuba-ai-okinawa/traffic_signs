@@ -9,6 +9,7 @@ import flask
 import pandas
 import tensorflow as tf
 import numpy as np
+import cv2
 
 import traffic.utilities
 import traffic.ml
@@ -60,9 +61,19 @@ def top_prediction():
         # Preprocessing
         image = image.astype(np.float32) / 255
 
-        # Magic here
+        # Magic herei
+        image = cv2.resize(image, (32, 32))
 
-        return "whatever"
+        y = APP.traffic_signs_model.predict(image[None])[0]
+
+        sorted_inds = np.argsort(y)
+
+        top_predictions = y[sorted_inds]
+        confidences = y[sorted_inds]
+
+        ret = 'prediction: {}, confidence: {}'.format(top_predictions[0], confidences[0])
+
+        return ret
 
 
 def main():
