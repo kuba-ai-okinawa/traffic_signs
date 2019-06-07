@@ -28,8 +28,7 @@ def test_top_prediction_endpoint():
     #         'image': (io.BytesIO(encoded_image.tostring()), 'image')
     #     }
 
-        # response = client.post("/top_prediction", data=data)
+    # response = client.post("/top_prediction", data=data)
 
     # Assert correct results here
     assert 1 == 1
-
