@@ -2,7 +2,6 @@
 Endpoints tests
 """
 
-import flask
 import pytest
 
 import scripts.run_server
@@ -11,9 +10,7 @@ import scripts.run_server
 @pytest.fixture
 def client():
     """Prepare client"""
-    app = flask.Flask('test')
-    scripts.run_server.setup_prediction_models(app)
-    app.register_blueprint(scripts.run_server.GENERAL)
+    app = scripts.run_server.create_app(is_test_env=True)
     client = app.test_client()
     yield client
 

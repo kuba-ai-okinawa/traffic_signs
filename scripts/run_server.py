@@ -13,7 +13,7 @@ import traffic.ml
 import traffic.utilities
 
 
-def setup_prediction_models(app):
+def setup_prediction_models(app, is_test_env):
     """
     Adds prediction models to application object
     :param app: flask application instance
@@ -21,7 +21,8 @@ def setup_prediction_models(app):
 
     # Set up traffic signs categorization model
     app.traffic_signs_model = traffic.ml.get_model(input_shape=(32, 32, 3), categories_count=43)
-    app.traffic_signs_model.load_weights(filepath="./data/untracked_data/traffic-signs-model.h5")
+    if not is_test_env:
+        app.traffic_signs_model.load_weights(filepath="./data/untracked_data/traffic-signs-model.h5")
 
     categories_data_frame = pandas.read_csv("./data/signs_ids_to_names.csv", comment="#")
     app.traffic_signs_categories = categories_data_frame["SignName"]
@@ -29,10 +30,10 @@ def setup_prediction_models(app):
     app.default_graph = tf.get_default_graph()
 
 
-GENERAL = flask.Blueprint('general', __name__)
+GENERAL_ENDPOINT = flask.Blueprint('general', __name__)
 
 
-@GENERAL.route("/ping")
+@GENERAL_ENDPOINT.route("/ping")
 def ping():
     """
     Simple health probe checkpoint
@@ -41,7 +42,7 @@ def ping():
     return "ping at {}".format(datetime.datetime.utcnow())
 
 
-@GENERAL.route("/top_prediction", methods=["POST"])
+@GENERAL_ENDPOINT.route("/top_prediction", methods=["POST"])
 def top_prediction():
     """
     Top prediction endpoint, outputs top prediction category and confidence
@@ -59,14 +60,21 @@ def top_prediction():
         return "whatever"
 
 
+def create_app(is_test_env=False):
+    """Create flask app"""
+    app = flask.Flask('traffic_signs')
+    app.debug = True
+    app.config['TESTING'] = is_test_env
+    app.register_blueprint(GENERAL_ENDPOINT)
+    setup_prediction_models(app, is_test_env)
+    return app
+
+
 def main():
     """
     Script entry point
     """
-    app = flask.Flask('traffic_signs')
-    app.debug = True
-    setup_prediction_models(app)
-    app.register_blueprint(GENERAL)
+    app = create_app(is_test_env=False)
     app.run(host="0.0.0.0", port=5000)
 
 
