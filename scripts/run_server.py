@@ -38,6 +38,17 @@ APP.debug = True
 setup_prediction_models(APP)
 
 
+def compute_top_k_indexes(predicted: np.ndarray, k: int):
+    sorted_indexes = np.argsort(predicted)
+    
+    assert k > 0
+    
+    if k > len(APP.traffic_signs_categories):
+        k = len(APP.traffic_signs_categories)
+
+    return sorted_indexes[:k]
+
+
 @APP.route("/ping")
 def ping():
     """
