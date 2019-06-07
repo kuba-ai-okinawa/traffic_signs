@@ -2,9 +2,12 @@
 Endpoints tests
 """
 
+import io
 import json
 import flask
 import pytest
+import numpy as np
+import cv2
 
 import scripts.run_server
 
@@ -14,7 +17,7 @@ def client():
     """Prepare client"""
     app = flask.Flask('test')
     scripts.run_server.setup_prediction_models(app)
-    app.register_blueprint(scripts.run_server.GENERAL)
+    app.register_blueprint(scripts.run_server.GENERAL_ENDPOINT)
     client = app.test_client()
     yield client
 
@@ -47,8 +50,6 @@ def test_top_prediction_endpoint(client, sample_image):
     Test top prediction endpoint
     """
 
-    resp = client.get('/top_prediction')
-
     result_dict_byte = client.post("/top_prediction", data=sample_image)
     result_dict = json.loads(str(result_dict_byte.data))
 
@@ -64,7 +65,6 @@ def test_topk_prediction_endpoint(client, sample_image):
     """
     Test top-k prediction endpoint
     """
-    resp = client.get('/top_prediction')
 
     result_list_byte = client.post("/top_prediction", data=sample_image, k=5)
     result_dicts = json.loads(str(result_list_byte.data))
