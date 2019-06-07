@@ -76,7 +76,9 @@ def top_prediction():
         # Magic herei
 
         y = APP.traffic_signs_model.predict(image)[0]
-        top_1_dict = generate_top_k_dicts(y, 1)[0]
+
+        k = int(flask.request.form['k'])
+        top_1_dict = generate_top_k_dicts(y, k)[0]
 
         return json.dumps(top_1_dict)
 
