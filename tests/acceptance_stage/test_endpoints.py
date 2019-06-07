@@ -11,7 +11,7 @@ def test_ping_endpoint():
 
     with APP.test_client() as client:
         resp = client.get('/ping')
-    # Should implement a real test here
+
     assert 200 == resp.status_code
     assert "ping" in str(resp.data)
 
