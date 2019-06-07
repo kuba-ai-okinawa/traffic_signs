@@ -10,12 +10,11 @@ import numpy as np
 import pandas
 import tensorflow as tf
 import cv2
-
 import traffic.ml
 import traffic.utilities
 
 
-def setup_prediction_models(app, is_test_env):
+def setup_prediction_models(app, model_weight_path, ids_name_path, is_test_env):
     """
     Adds prediction models to application object
     :param app: flask application instance
@@ -24,9 +23,9 @@ def setup_prediction_models(app, is_test_env):
     # Set up traffic signs categorization model
     app.traffic_signs_model = traffic.ml.get_model(input_shape=(32, 32, 3), categories_count=43)
     if not is_test_env:
-        app.traffic_signs_model.load_weights(filepath="./data/untracked_data/traffic-signs-model.h5")
+        app.traffic_signs_model.load_weights(filepath=model_weight_path)
 
-    categories_data_frame = pandas.read_csv("./data/signs_ids_to_names.csv", comment="#")
+    categories_data_frame = pandas.read_csv(ids_name_path, comment="#")
     app.traffic_signs_categories = categories_data_frame["SignName"]
 
     app.default_graph = tf.get_default_graph()
@@ -85,7 +84,7 @@ def load_image(raw_image_file):
     return preprocess(image)
 
 
-def preprocess(np_image: np.ndarray) -> np.ndarray:
+def preprocess(np_image: np.ndarray):
     """
     convert np_image into acceptable shape and range for CNN
     :param np_image: np.ndarray [W, H, C]
@@ -122,13 +121,14 @@ def generate_top_k_dicts(predictions: np.ndarray, k: int):
             for rank, top_k_index in enumerate(top_k_indexes)]
 
 
-def create_app(is_test_env=False):
+def create_app(config, is_test_env=False):
     """Create flask app"""
     app = flask.Flask('traffic_signs')
     app.debug = True
     app.config['TESTING'] = is_test_env
+    setup_prediction_models(app, config["model_weight_path"], config["ids_name_path"], is_test_env)
     app.register_blueprint(GENERAL_ENDPOINT)
-    setup_prediction_models(app, is_test_env)
+
     return app
 
 
@@ -136,8 +136,10 @@ def main():
     """
     Script entry point
     """
-    app = create_app(is_test_env=False)
-    app.run(host="0.0.0.0", port=5000)
+    config = traffic.utilities.get_yaml_configuration(None)
+
+    app = create_app(config, is_test_env=False)
+    app.run(host=config["host"], port=config["port"])
 
 
 if __name__ == "__main__":

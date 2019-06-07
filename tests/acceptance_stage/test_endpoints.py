@@ -3,14 +3,18 @@ Endpoints tests
 """
 
 import pytest
-
 import scripts.run_server
 
 
 @pytest.fixture
 def client():
     """Prepare client"""
-    app = scripts.run_server.create_app(is_test_env=True)
+
+    config = {
+        "model_weight_path": "",
+        "ids_name_path": "./data/signs_ids_to_names.csv"
+    }
+    app = scripts.run_server.create_app(config, is_test_env=True)
     client = app.test_client()
     yield client
 
