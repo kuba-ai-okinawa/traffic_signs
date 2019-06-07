@@ -3,7 +3,6 @@ Script for running flask server
 """
 
 import datetime
-import argparse
 
 import flask
 import numpy as np
@@ -12,10 +11,8 @@ import tensorflow as tf
 import traffic.ml
 import traffic.utilities
 
-from scripts.config import load_yaml
 
-
-def setup_prediction_models(app, model_weight_path, ids_name_path):
+def setup_prediction_models(app, model_weight_path, ids_name_path, is_test_env):
     """
     Adds prediction models to application object
     :param app: flask application instance
@@ -23,7 +20,8 @@ def setup_prediction_models(app, model_weight_path, ids_name_path):
 
     # Set up traffic signs categorization model
     app.traffic_signs_model = traffic.ml.get_model(input_shape=(32, 32, 3), categories_count=43)
-    app.traffic_signs_model.load_weights(filepath=model_weight_path)
+    if not is_test_env:
+        app.traffic_signs_model.load_weights(filepath=model_weight_path)
 
     categories_data_frame = pandas.read_csv(ids_name_path, comment="#")
     app.traffic_signs_categories = categories_data_frame["SignName"]
@@ -31,10 +29,10 @@ def setup_prediction_models(app, model_weight_path, ids_name_path):
     app.default_graph = tf.get_default_graph()
 
 
-GENERAL = flask.Blueprint('general', __name__)
+GENERAL_ENDPOINT = flask.Blueprint('general', __name__)
 
 
-@GENERAL.route("/ping")
+@GENERAL_ENDPOINT.route("/ping")
 def ping():
     """
     Simple health probe checkpoint
@@ -43,7 +41,7 @@ def ping():
     return "ping at {}".format(datetime.datetime.utcnow())
 
 
-@GENERAL.route("/top_prediction", methods=["POST"])
+@GENERAL_ENDPOINT.route("/top_prediction", methods=["POST"])
 def top_prediction():
     """
     Top prediction endpoint, outputs top prediction category and confidence
@@ -61,24 +59,24 @@ def top_prediction():
         return "whatever"
 
 
+def create_app(config, is_test_env=False):
+    """Create flask app"""
+    app = flask.Flask('traffic_signs')
+    app.debug = True
+    app.config['TESTING'] = is_test_env
+    setup_prediction_models(app, config["model_weight_path"], config["ids_name_path"], is_test_env)
+    app.register_blueprint(GENERAL_ENDPOINT)
+
+    return app
+
+
 def main():
     """
     Script entry point
     """
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--config_path")
-    args = parser.parse_args()
-    # print(load_yaml(args.config_path))
-    config = load_yaml(args.config_path)
-    print(config)
+    config = traffic.utilities.get_yaml_configuration(None)
 
-
-#     APP.run(host=config["host"], port=config["port"])
-    app = flask.Flask('traffic_signs')
-    app.debug = True
-    setup_prediction_models(app, config["model_weight_path"], config["ids_name_path"])
-#     setup_prediction_models(app)
-    app.register_blueprint(GENERAL)
+    app = create_app(config, is_test_env=False)
     app.run(host=config["host"], port=config["port"])
 
 

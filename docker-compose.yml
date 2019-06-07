@@ -7,4 +7,4 @@ services:
       - ".:/app"
     ports:
       - "5000:5000"
-    command: python ./scripts/run_server.py --config_path=./.config.yaml
+    command: python ./scripts/run_server.py --config_path=./config.yaml

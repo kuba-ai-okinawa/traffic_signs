@@ -2,18 +2,19 @@
 Endpoints tests
 """
 
-import flask
 import pytest
-from scripts import run_server
+import scripts.run_server
+import traffic.utilities
 
 
 @pytest.fixture
 def client():
     """Prepare client"""
-    app = flask.Flask('test')
-    run_server.setup_prediction_models(
-        app, "./data/untracked_data/traffic-signs-model.h5", "./data/signs_ids_to_names.csv")
-    app.register_blueprint(run_server.GENERAL)
+
+    config = {
+        "ids_name_path": "./data/signs_ids_to_names.csv"
+    }
+    app = scripts.run_server.create_app(config, is_test_env=True)
     client = app.test_client()
     yield client
 
