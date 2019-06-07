@@ -67,19 +67,39 @@ def top_prediction():
     """
     app = flask.current_app
     with app.default_graph.as_default():
-        raw_image_file = flask.request.files["image"]
-        image = traffic.utilities.binary_rgb_image_string_to_numpy_image(raw_image_file.read())
-
-        # Preprocessing
-        image = preprocess(image)
-
-        # Magic herei
+        image = load_image()
 
         y = app.traffic_signs_model.predict(image)[0]
 
         top_1_dict = generate_top_k_dicts(y, 1)[0]
 
         return json.dumps(top_1_dict)
+
+
+@GENERAL_ENDPOINT.route("/top_k_prediction", methods=["POST"])
+def top_k_prediction():
+    """
+    Top prediction endpoint, outputs top prediction category and confidence
+    """
+
+    with flask.current_app.default_graph.as_default():
+        image = load_image()
+        k = int(flask.request.form['k'])
+
+        y = flask.current_app.traffic_signs_model.predict(image)[0]
+        top_k_dicts = generate_top_k_dicts(y, k)
+
+        return json.dumps(top_k_dicts)
+
+
+def load_image():
+    """
+    get image data from POST and convert acceptable np.ndarray for CNN
+    :return:
+    """
+    raw_image_file = flask.request.files["image"]
+    image = traffic.utilities.binary_rgb_image_string_to_numpy_image(raw_image_file.read())
+    return preprocess(image)
 
 
 def generate_top_k_dicts(predicted: np.ndarray, k: int):
