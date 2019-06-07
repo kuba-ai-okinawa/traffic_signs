@@ -77,8 +77,7 @@ def top_prediction():
 
         y = APP.traffic_signs_model.predict(image)[0]
 
-        k = int(flask.request.form['k'])
-        top_1_dict = generate_top_k_dicts(y, k)[0]
+        top_1_dict = generate_top_k_dicts(y, 1)[0]
 
         return json.dumps(top_1_dict)
 
@@ -93,7 +92,7 @@ def top_k_prediction():
 
         raw_image_file = flask.request.files["image"]
         image = traffic.utilities.binary_rgb_image_string_to_numpy_image(raw_image_file.read())
-        k = 5
+        k = int(flask.request.form['k'])
 
         # Preprocessing
         image = preprocess(image)
