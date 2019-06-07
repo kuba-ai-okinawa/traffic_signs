@@ -35,22 +35,6 @@ def setup_prediction_models(app, is_test_env):
 GENERAL_ENDPOINT = flask.Blueprint('general', __name__)
 
 
-def compute_top_k_indexes(predicted: np.ndarray, k: int):
-    """
-    :param predicted: CNN outputs (confidence values)
-    :param k: number of top results
-    :return: top-k index list
-    """
-    sorted_indexes = np.argsort(predicted)[::-1]
-    traffic_sign_categories = flask.current_app.traffic_signs_categories
-    assert k > 0
-
-    if k > len(traffic_sign_categories):
-        k = len(traffic_sign_categories)
-
-    return sorted_indexes[:k]
-
-
 @GENERAL_ENDPOINT.route("/ping")
 def ping():
     """
@@ -102,6 +86,33 @@ def load_image():
     return preprocess(image)
 
 
+def preprocess(np_image: np.ndarray) -> np.ndarray:
+    """
+    convert np_image into acceptable shape and range for CNN
+    :param np_image: np.ndarray [W, H, C]
+    :return: np.ndarray [1, 32, 32, 3]
+    """
+    resized_image = cv2.resize(np_image, (32, 32), cv2.INTER_LANCZOS4)
+    resized_image = resized_image.astype(np.float32) / 255
+    return resized_image[np.newaxis, :, :, :]
+
+
+def compute_top_k_indexes(predicted: np.ndarray, k: int):
+    """
+    :param predicted: CNN outputs (confidence values)
+    :param k: number of top results
+    :return: top-k index list
+    """
+    sorted_indexes = np.argsort(predicted)[::-1]
+    traffic_sign_categories = flask.current_app.traffic_signs_categories
+    assert k > 0
+
+    if k > len(traffic_sign_categories):
+        k = len(traffic_sign_categories)
+
+    return sorted_indexes[:k]
+
+
 def generate_top_k_dicts(predicted: np.ndarray, k: int):
     """
     generate top-k dictionaries from CNN output
@@ -115,17 +126,6 @@ def generate_top_k_dicts(predicted: np.ndarray, k: int):
              'category': app.traffic_signs_categories[top_k_index],
              'confidence': float(predicted[top_k_index])}
             for rank, top_k_index in enumerate(top_k_indexes)]
-
-
-def preprocess(np_image: np.ndarray) -> np.ndarray:
-    """
-    convert np_image into acceptable shape and range for CNN
-    :param np_image: np.ndarray [W, H, C]
-    :return: np.ndarray [1, 32, 32, 3]
-    """
-    resized_image = cv2.resize(np_image, (32, 32), cv2.INTER_LANCZOS4)
-    resized_image = resized_image.astype(np.float32) / 255
-    return resized_image[np.newaxis, :, :, :]
 
 
 def create_app(is_test_env=False):
