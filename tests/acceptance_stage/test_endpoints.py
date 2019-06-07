@@ -4,6 +4,7 @@ Endpoints tests
 
 from scripts.run_server import APP
 
+
 def test_ping_endpoint():
     """
     Test ping endpoint
@@ -12,7 +13,7 @@ def test_ping_endpoint():
     with APP.test_client() as client:
         resp = client.get('/ping')
 
-    assert 200 == resp.status_code
+    assert resp.status_code == 200
     assert "ping" in str(resp.data)
 
 
@@ -32,8 +33,7 @@ def test_top_prediction_endpoint():
     #         'image': (io.BytesIO(encoded_image.tostring()), 'image')
     #     }
 
-        # response = client.post("/top_prediction", data=data)
+    # response = client.post("/top_prediction", data=data)
 
     # Assert correct results here
     assert 1 == 1
-
