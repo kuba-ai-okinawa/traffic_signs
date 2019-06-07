@@ -11,6 +11,7 @@ def client():
     """Prepare client"""
 
     config = {
+        "model_weight_path": "",
         "ids_name_path": "./data/signs_ids_to_names.csv"
     }
     app = scripts.run_server.create_app(config, is_test_env=True)
