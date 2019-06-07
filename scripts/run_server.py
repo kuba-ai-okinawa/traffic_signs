@@ -10,6 +10,7 @@ import pandas
 import tensorflow as tf
 import numpy as np
 import cv2
+import json
 
 import traffic.utilities
 import traffic.ml
@@ -75,15 +76,17 @@ def top_prediction():
         # Magic herei
 
         y = APP.traffic_signs_model.predict(image)[0]
+        top_1_dict = generate_top_k_dicts(y, 1)[0]
 
-        sorted_inds = np.argsort(y)
+        return json.dumps(top_1_dict)
 
-        top_predictions = y[sorted_inds]
-        confidences = y[sorted_inds]
 
-        ret = 'prediction: {}, confidence: {}'.format(top_predictions[0], confidences[0])
-
-        return ret
+def generate_top_k_dicts(predicted: np.ndarray, k: int):
+    top_k_indexes = compute_top_k_indexes(predicted, k)
+    return [{'rank': rank,
+             'category': APP.traffic_signs_categories[top_k_index],
+             'confidence': float(predicted[top_k_index])}
+            for rank, top_k_index in enumerate(top_k_indexes)]
 
 
 def preprocess(np_image: np.ndarray) -> np.ndarray:
