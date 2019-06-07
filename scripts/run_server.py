@@ -40,10 +40,10 @@ setup_prediction_models(APP)
 
 
 def compute_top_k_indexes(predicted: np.ndarray, k: int):
-    sorted_indexes = np.argsort(predicted)
-    
+    sorted_indexes = np.argsort(predicted)[::-1]
+
     assert k > 0
-    
+
     if k > len(APP.traffic_signs_categories):
         k = len(APP.traffic_signs_categories)
 
