@@ -76,7 +76,6 @@ def top_prediction():
 
 
 def preprocess(np_image: np.ndarray) -> np.ndarray:
-    import cv2
     resized_image = cv2.resize(np_image, (32, 32), cv2.INTER_LANCZOS4)
     resized_image = resized_image.astype(np.float32) / 255
     return resized_image[np.newaxis, :, :, :]
