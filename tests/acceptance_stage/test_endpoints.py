@@ -2,17 +2,27 @@
 Endpoints tests
 """
 
-from scripts.run_server import APP
+import flask
+import pytest
+
+import scripts.run_server
 
 
-def test_ping_endpoint():
+@pytest.fixture
+def client():
+    """Prepare client"""
+    app = flask.Flask('test')
+    scripts.run_server.setup_prediction_models(app)
+    app.register_blueprint(scripts.run_server.GENERAL)
+    client = app.test_client()
+    yield client
+
+
+def test_ping_endpoint(client):
     """
     Test ping endpoint
     """
-
-    with APP.test_client() as client:
-        resp = client.get('/ping')
-
+    resp = client.get('/ping')
     assert resp.status_code == 200
     assert "ping" in str(resp.data)
 
