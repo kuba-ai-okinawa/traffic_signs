@@ -4,7 +4,6 @@ Endpoints tests
 
 import pytest
 import scripts.run_server
-import traffic.utilities
 
 
 @pytest.fixture
