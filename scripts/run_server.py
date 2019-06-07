@@ -83,7 +83,7 @@ def top_prediction():
 
 def generate_top_k_dicts(predicted: np.ndarray, k: int):
     top_k_indexes = compute_top_k_indexes(predicted, k)
-    return [{'rank': rank,
+    return [{'rank': rank + 1,
              'category': APP.traffic_signs_categories[top_k_index],
              'confidence': float(predicted[top_k_index])}
             for rank, top_k_index in enumerate(top_k_indexes)]
