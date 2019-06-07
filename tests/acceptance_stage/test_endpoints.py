@@ -2,6 +2,7 @@
 Endpoints tests
 """
 
+import json
 import flask
 import pytest
 
@@ -18,6 +19,20 @@ def client():
     yield client
 
 
+@pytest.fixture
+def sample_image():
+    """
+    Make image for test
+    """
+    image = np.ones(shape=(32, 32, 3))
+    _, encoded_image = cv2.imencode('.jpg', image)
+
+    data = {
+        'image': (io.BytesIO(encoded_image.tostring()), 'image')
+    }
+    yield data
+
+
 def test_ping_endpoint(client):
     """
     Test ping endpoint
@@ -27,23 +42,37 @@ def test_ping_endpoint(client):
     assert "ping" in str(resp.data)
 
 
-def test_top_prediction_endpoint():
+def test_top_prediction_endpoint(client, sample_image):
     """
     Test top prediction endpoint
     """
 
-    # app = ...
+    resp = client.get('/top_prediction')
 
-    # with app.test_client() as client:
-    #
-    #     image = np.ones(shape=(32, 32, 3))
-    #     _, encoded_image = cv2.imencode('.jpg', image)
-    #
-    #     data = {
-    #         'image': (io.BytesIO(encoded_image.tostring()), 'image')
-    #     }
+    result_dict_byte = client.post("/top_prediction", data=sample_image)
+    result_dict = json.loads(str(result_dict_byte.data))
 
-    # response = client.post("/top_prediction", data=data)
+    expected_dict = {'rank': int, 'category': str, 'confidence': float}
 
-    # Assert correct results here
-    assert 1 == 1
+    result_key = list(result_dict.keys())
+    for expected_key, expected_type in expected_dict.items():
+        assert expected_key in result_key
+        assert isinstance(result_dict[expected_key], expected_type)
+
+
+def test_topk_prediction_endpoint(client, sample_image):
+    """
+    Test top-k prediction endpoint
+    """
+    resp = client.get('/top_prediction')
+
+    result_list_byte = client.post("/top_prediction", data=sample_image, k=5)
+    result_dicts = json.loads(str(result_list_byte.data))
+
+    expected_dict = {'rank': int, 'category': str, 'confidence': float}
+    for result_dict in result_dicts:
+        result_key = list(result_dict.keys())
+        for expected_key, expected_type in expected_dict.items():
+            assert expected_key in result_key
+            assert isinstance(result_dict[expected_key], expected_type)
+    assert len(result_dicts) == 5
