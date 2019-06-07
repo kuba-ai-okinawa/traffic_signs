@@ -10,7 +10,7 @@ import scripts.run_server
 @pytest.fixture
 def client():
     """Prepare client"""
-    app = scripts.run_server.create_app(testing=True)
+    app = scripts.run_server.create_app(is_test_env=True)
     client = app.test_client()
     yield client
 

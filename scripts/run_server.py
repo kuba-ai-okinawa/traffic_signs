@@ -13,7 +13,7 @@ import traffic.ml
 import traffic.utilities
 
 
-def setup_prediction_models(app, testing):
+def setup_prediction_models(app, is_test_env):
     """
     Adds prediction models to application object
     :param app: flask application instance
@@ -21,7 +21,7 @@ def setup_prediction_models(app, testing):
 
     # Set up traffic signs categorization model
     app.traffic_signs_model = traffic.ml.get_model(input_shape=(32, 32, 3), categories_count=43)
-    if not testing:
+    if not is_test_env:
         app.traffic_signs_model.load_weights(filepath="./data/untracked_data/traffic-signs-model.h5")
 
     categories_data_frame = pandas.read_csv("./data/signs_ids_to_names.csv", comment="#")
@@ -60,13 +60,13 @@ def top_prediction():
         return "whatever"
 
 
-def create_app(testing=False):
+def create_app(is_test_env=False):
     """Create flask app"""
     app = flask.Flask('traffic_signs')
     app.debug = True
-    app.config['TESTING'] = testing
+    app.config['TESTING'] = is_test_env
     app.register_blueprint(GENERAL_ENDPOINT)
-    setup_prediction_models(app, testing)
+    setup_prediction_models(app, is_test_env)
     return app
 
 
@@ -74,7 +74,7 @@ def main():
     """
     Script entry point
     """
-    app = create_app(testing=False)
+    app = create_app(is_test_env=False)
     app.run(host="0.0.0.0", port=5000)
 
 
